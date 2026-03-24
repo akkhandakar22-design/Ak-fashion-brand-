@@ -1,0 +1,5 @@
+{
+  "name": "AK Fashion Brand",
+  "description": "An exclusive, high-end fashion e-commerce experience for the modern trendsetter.",
+  "requestFramePermissions": ["geolocation"]
+}

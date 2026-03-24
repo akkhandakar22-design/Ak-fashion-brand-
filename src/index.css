@@ -1,0 +1,82 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --color-primary: #C5A059; /* Champagne Gold */
+  --color-primary-dark: #A68546;
+  --color-ivory: #FDFCF8;
+  --color-beige: #F5F5F0;
+  --color-luxury-black: #1A1A1A;
+  --color-gold: #D4AF37;
+  --color-gold-light: #F9E29C;
+}
+
+@layer base {
+  body {
+    @apply font-sans bg-ivory text-luxury-black antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+.luxury-dark {
+  background: radial-gradient(circle at center, #2C2C2C 0%, #000000 100%);
+  position: relative;
+}
+
+.luxury-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM34 4V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.gold-text {
+  background: linear-gradient(to bottom, #F9E29C 0%, #D4AF37 50%, #A68546 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border {
+  border: 1px solid transparent;
+  background-image: linear-gradient(white, white), linear-gradient(to right, #D4AF37, #F9E29C);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+
+.mobile-container {
+  @apply max-w-md mx-auto min-h-screen bg-ivory relative overflow-hidden flex flex-col;
+}
+
+.bottom-nav-item {
+  @apply flex flex-col items-center justify-center flex-1 py-2 text-gray-400 transition-all duration-300;
+}
+
+.bottom-nav-item.active {
+  @apply text-primary scale-110;
+}
+
+.product-card {
+  @apply bg-white rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/50 transition-all duration-500 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-1;
+}
+
+.neumorphic-circle {
+  @apply rounded-full bg-ivory shadow-[4px_4px_10px_rgba(0,0,0,0.05),-4px_-4px_10px_rgba(255,255,255,0.8)] flex items-center justify-center transition-all active:shadow-inner;
+}
+
+.luxury-gradient {
+  @apply bg-gradient-to-br from-white via-ivory to-beige;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

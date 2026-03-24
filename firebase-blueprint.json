@@ -1,0 +1,88 @@
+{
+  "entities": {
+    "Category": {
+      "title": "Category",
+      "description": "Product categories",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["name", "image"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Luxury products",
+      "type": "object",
+      "properties": {
+        "category_id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "discount_price": { "type": "number" },
+        "image": { "type": "string" },
+        "media": { "type": "string", "description": "JSON string of media items" },
+        "stock": { "type": "integer" },
+        "is_featured": { "type": "boolean" },
+        "is_trending": { "type": "boolean" },
+        "rating": { "type": "number" },
+        "reviews_count": { "type": "integer" },
+        "has_free_delivery": { "type": "boolean" },
+        "has_return_policy": { "type": "boolean" },
+        "has_warranty": { "type": "boolean" }
+      },
+      "required": ["name", "price", "image", "category_id"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User profiles",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] }
+      },
+      "required": ["email", "name"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer orders",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string" },
+        "user_name": { "type": "string" },
+        "total_price": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "packed", "shipped", "delivered"] },
+        "payment_method": { "type": "string" },
+        "address": { "type": "string" },
+        "estimated_delivery": { "type": "string", "format": "date-time" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "items": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["user_id", "total_price", "status", "items"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Product reviews",
+      "type": "object",
+      "properties": {
+        "product_id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "user_name": { "type": "string" },
+        "rating": { "type": "integer" },
+        "comment": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["product_id", "user_id", "rating"]
+    }
+  },
+  "firestore": {
+    "categories": { "schema": "Category", "description": "Collection of categories" },
+    "products": { "schema": "Product", "description": "Collection of products" },
+    "users": { "schema": "User", "description": "Collection of user profiles" },
+    "orders": { "schema": "Order", "description": "Collection of orders" },
+    "reviews": { "schema": "Review", "description": "Collection of reviews" }
+  }
+}
