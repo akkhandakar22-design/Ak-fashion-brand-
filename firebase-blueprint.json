@@ -53,13 +53,30 @@
       "properties": {
         "user_id": { "type": "string" },
         "user_name": { "type": "string" },
+        "user_email": { "type": "string", "format": "email" },
         "total_price": { "type": "number" },
         "status": { "type": "string", "enum": ["pending", "packed", "shipped", "delivered"] },
         "payment_method": { "type": "string" },
         "address": { "type": "string" },
         "estimated_delivery": { "type": "string", "format": "date-time" },
         "created_at": { "type": "string", "format": "date-time" },
-        "items": { "type": "array", "items": { "type": "object" } }
+        "items": { 
+          "type": "array", 
+          "items": { 
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "product_id": { "type": "string" },
+              "quantity": { "type": "integer" },
+              "price": { "type": "number" },
+              "name": { "type": "string" },
+              "image": { "type": "string" },
+              "return_status": { "type": "string", "enum": ["not_requested", "requested", "approved", "rejected", "completed"] },
+              "return_reason": { "type": "string" },
+              "return_requested_at": { "type": "string", "format": "date-time" }
+            }
+          } 
+        }
       },
       "required": ["user_id", "total_price", "status", "items"]
     },

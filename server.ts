@@ -69,6 +69,70 @@ export async function createExpressApp() {
     }
   });
 
+  app.post("/api/notify-return-request", async (req, res) => {
+    try {
+      const { orderId, userName, itemName, reason } = req.body;
+      const adminEmail = process.env.ADMIN_EMAIL || 'akkhandakar22@gmail.com';
+
+      if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        return res.json({ success: true, message: 'Email skipped' });
+      }
+
+      const mailOptions = {
+        from: `"Ak Shop" <${process.env.SMTP_USER}>`,
+        to: adminEmail,
+        subject: `Return Request: Order #${orderId.slice(-6).toUpperCase()}`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
+            <h2 style="color: #F27D26;">New Return Request!</h2>
+            <p><strong>Order ID:</strong> #${orderId.toUpperCase()}</p>
+            <p><strong>Customer:</strong> ${userName}</p>
+            <p><strong>Item:</strong> ${itemName}</p>
+            <p><strong>Reason:</strong> ${reason}</p>
+            <p style="margin-top: 30px; font-size: 12px; color: #888;">Please log in to the admin panel to review this request.</p>
+          </div>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error sending return request notification:", error);
+      res.status(500).json({ error: "Failed to send return request notification" });
+    }
+  });
+
+  app.post("/api/notify-return-status", async (req, res) => {
+    try {
+      const { orderId, userEmail, itemName, status } = req.body;
+
+      if (!process.env.SMTP_USER || !process.env.SMTP_PASS || !userEmail) {
+        return res.json({ success: true, message: 'Email skipped' });
+      }
+
+      const mailOptions = {
+        from: `"Ak Shop" <${process.env.SMTP_USER}>`,
+        to: userEmail,
+        subject: `Return Request ${status.toUpperCase()}: Order #${orderId.slice(-6).toUpperCase()}`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
+            <h2 style="color: ${status === 'approved' ? '#22c55e' : '#ef4444'};">Return Request ${status.toUpperCase()}</h2>
+            <p>Hello,</p>
+            <p>Your return request for <strong>${itemName}</strong> from order <strong>#${orderId.toUpperCase()}</strong> has been <strong>${status}</strong>.</p>
+            ${status === 'approved' ? '<p>Our team will contact you shortly with the next steps for the return process.</p>' : '<p>If you have any questions, please contact our support team.</p>'}
+            <p style="margin-top: 30px; font-size: 12px; color: #888;">Thank you for shopping with Ak Shop.</p>
+          </div>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error sending return status notification:", error);
+      res.status(500).json({ error: "Failed to send return status notification" });
+    }
+  });
+
   app.get("/api/categories", async (req, res) => {
     try {
       const categoriesCol = collection(db, "categories");

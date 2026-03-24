@@ -239,6 +239,37 @@ export default function Admin() {
     }
   };
 
+  const updateItemReturnStatus = async (orderId: string, itemIdx: number, status: string) => {
+    try {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const newItems = [...order.items];
+      newItems[itemIdx] = {
+        ...newItems[itemIdx],
+        return_status: status as any
+      };
+
+      await updateDoc(doc(db, 'orders', orderId), { items: newItems });
+      toast.success(`Return ${status}`);
+
+      // Notify User
+      fetch('/api/notify-return-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          userEmail: order.user_email,
+          itemName: newItems[itemIdx].name,
+          status
+        })
+      }).catch(err => console.error('Notification error:', err));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `orders/${orderId}`);
+      toast.error('Failed to update return status');
+    }
+  };
+
   const openAddModal = () => {
     setEditingProduct({
       name: '',
@@ -505,16 +536,42 @@ export default function Admin() {
                   <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Order Items</h4>
                   <div className="space-y-2">
                     {order.items?.map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between text-xs">
-                        <div className="flex items-center space-x-3">
-                          <img src={item.image} alt={item.name} className="w-8 h-8 rounded-lg object-cover" />
-                          <div>
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-[10px] text-gray-400">Qty: {item.quantity} × ${item.price.toFixed(2)}</p>
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center space-x-3">
+                            <img src={item.image} alt={item.name} className="w-8 h-8 rounded-lg object-cover" />
+                            <div>
+                              <p className="font-medium">{item.name}</p>
+                              <p className="text-[10px] text-gray-400">Qty: {item.quantity} × ${item.price.toFixed(2)}</p>
+                              {item.return_status && item.return_status !== 'not_requested' && (
+                                <div className="mt-1 space-y-1">
+                                  <p className="text-[10px] font-bold text-orange-500 uppercase tracking-wider">
+                                    Return: {item.return_status.replace('_', ' ')}
+                                  </p>
+                                  {item.return_reason && (
+                                    <p className="text-[9px] text-gray-500 italic">Reason: {item.return_reason}</p>
+                                  )}
+                                  {item.return_status === 'requested' && (
+                                    <div className="flex space-x-2 mt-1">
+                                      <button 
+                                        onClick={() => updateItemReturnStatus(order.id, idx, 'approved')}
+                                        className="px-2 py-1 bg-green-500 text-white rounded text-[8px] font-bold uppercase"
+                                      >
+                                        Approve
+                                      </button>
+                                      <button 
+                                        onClick={() => updateItemReturnStatus(order.id, idx, 'rejected')}
+                                        className="px-2 py-1 bg-red-500 text-white rounded text-[8px] font-bold uppercase"
+                                      >
+                                        Reject
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
+                          <span className="font-bold">${(item.quantity * item.price).toFixed(2)}</span>
                         </div>
-                        <span className="font-bold">${(item.quantity * item.price).toFixed(2)}</span>
-                      </div>
                     ))}
                   </div>
                 </div>

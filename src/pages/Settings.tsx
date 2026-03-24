@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, User, Bell, Shield, HelpCircle, Settings as SettingsIcon, Save } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../AppContext';
@@ -26,8 +26,49 @@ export default function Settings() {
     }
   };
 
+  const [activeHelp, setActiveHelp] = useState<string | null>(null);
+
   const handleHelpClick = (label: string) => {
-    toast.success(`Opening ${label}... Our curator will be with you shortly.`);
+    setActiveHelp(activeHelp === label ? null : label);
+  };
+
+  const helpContent: Record<string, { title: string, content: string[] }> = {
+    'order_inquiries': {
+      title: t('order_inquiries'),
+      content: [
+        'How can I track my order?',
+        'Can I change my shipping address after placing an order?',
+        'What should I do if my order is delayed?',
+        'How do I cancel my order?'
+      ]
+    },
+    'shipping_returns': {
+      title: t('shipping_returns'),
+      content: [
+        'What are your shipping rates?',
+        'How long does delivery take?',
+        'What is your return policy?',
+        'How do I initiate a return?'
+      ]
+    },
+    'authenticity_guarantee': {
+      title: t('authenticity_guarantee'),
+      content: [
+        'Are all products authentic?',
+        'How do you verify authenticity?',
+        'Do products come with certificates?',
+        'What if I receive a counterfeit item?'
+      ]
+    },
+    'contact_curator': {
+      title: t('contact_curator'),
+      content: [
+        'Email: support@akshop.luxury',
+        'Phone: +880 1XXX XXXXXX',
+        'WhatsApp: +880 1XXX XXXXXX',
+        'Available 24/7 for our elite members'
+      ]
+    }
   };
 
   const renderContent = () => {
@@ -152,17 +193,40 @@ export default function Settings() {
             <div className="bg-white/50 border border-white p-8 rounded-[40px] shadow-sm space-y-8">
               <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">{t('help_center')}</h3>
               <div className="space-y-4">
-                <HelpItem label="Order Inquiries" onClick={() => handleHelpClick('Order Inquiries')} />
-                <HelpItem label="Shipping & Returns" onClick={() => handleHelpClick('Shipping & Returns')} />
-                <HelpItem label="Authenticity Guarantee" onClick={() => handleHelpClick('Authenticity Guarantee')} />
-                <HelpItem label="Contact Curator" onClick={() => handleHelpClick('Contact Curator')} />
+                {Object.keys(helpContent).map((key) => (
+                  <div key={key} className="space-y-4">
+                    <HelpItem 
+                      label={helpContent[key].title} 
+                      onClick={() => handleHelpClick(key)} 
+                      isOpen={activeHelp === key}
+                    />
+                    <AnimatePresence>
+                      {activeHelp === key && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden px-4"
+                        >
+                          <div className="py-4 space-y-3 border-l-2 border-primary/20 pl-6">
+                            {helpContent[key].content.map((item, idx) => (
+                              <p key={idx} className="text-[11px] text-gray-500 font-light leading-relaxed hover:text-primary cursor-pointer transition-colors">
+                                • {item}
+                              </p>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
               </div>
             </div>
             <button 
               onClick={() => toast.success('Connecting to live support...')}
               className="w-full py-5 bg-primary text-white rounded-full font-bold text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
             >
-              Start Live Chat
+              {t('start_live_chat')}
             </button>
           </div>
         );
@@ -218,14 +282,21 @@ function ToggleItem({ label, description, defaultChecked }: { label: string, des
   );
 }
 
-function HelpItem({ label, onClick }: { label: string, onClick?: () => void }) {
+function HelpItem({ label, onClick, isOpen }: { label: string, onClick?: () => void, isOpen?: boolean }) {
   return (
     <button 
       onClick={onClick}
-      className="w-full flex items-center justify-between p-4 bg-ivory/30 rounded-[24px] border border-white hover:bg-white transition-colors active:scale-95"
+      className={`w-full flex items-center justify-between p-4 rounded-[24px] border transition-all duration-300 active:scale-95 ${
+        isOpen ? 'bg-white border-primary shadow-sm' : 'bg-ivory/30 border-white hover:bg-white'
+      }`}
     >
-      <span className="text-xs font-bold text-luxury-black uppercase tracking-widest">{label}</span>
-      <ChevronLeft size={14} className="text-gray-300 rotate-180" />
+      <span className={`text-xs font-bold uppercase tracking-widest transition-colors ${isOpen ? 'text-primary' : 'text-luxury-black'}`}>
+        {label}
+      </span>
+      <ChevronLeft 
+        size={14} 
+        className={`text-gray-300 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-180'}`} 
+      />
     </button>
   );
 }

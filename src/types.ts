@@ -40,6 +40,7 @@ export interface Order {
   id: string;
   user_id: string;
   user_name?: string;
+  user_email?: string;
   phone?: string;
   total_price: number;
   status: string;
@@ -54,6 +55,9 @@ export interface Order {
     price: number;
     name: string;
     image: string;
+    return_status?: 'not_requested' | 'requested' | 'approved' | 'rejected' | 'completed';
+    return_reason?: string;
+    return_requested_at?: string;
   }[];
 }
 
